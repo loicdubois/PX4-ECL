@@ -187,4 +187,26 @@ TEST_F(EkfBasicsTest, accelBiasEstimation)
 		<< "gyro_bias = " << gyro_bias(0) << ", " << gyro_bias(1) << ", " << gyro_bias(2);
 }
 
+TEST_F(EkfBasicsTest, reset_ekf_global_origin)
+{
+	double latitude  {0.0};
+	double longitude {0.0};
+	float  altitude  {0.0};
+
+	uint64_t origin_time = 0;
+
+	_ekf->getEkfGlobalOrigin(origin_time, latitude, longitude, altitude);
+
+	double latitude_new  = -33.0000005;
+	double longitude_new = 18.0000005;
+	float  altitude_new  = 150.0;
+
+	_ekf->setEkfGlobalOrigin(latitude_new, longitude_new, altitude_new);
+	_ekf->getEkfGlobalOrigin(origin_time, latitude, longitude, altitude);
+
+	// EKF origin MSL altitude cannot be reset without valid MSL origin.
+	EXPECT_DOUBLE_EQ(latitude, latitude_new);
+	EXPECT_DOUBLE_EQ(longitude, longitude_new);
+}
+
 // TODO: Add sampling tests
