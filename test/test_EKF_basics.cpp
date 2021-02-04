@@ -197,6 +197,10 @@ TEST_F(EkfBasicsTest, reset_ekf_global_origin)
 
 	_ekf->getEkfGlobalOrigin(origin_time, latitude, longitude, altitude);
 
+	_sensor_simulator.startGps();
+	_ekf->set_min_required_gps_health_time(1e6);
+	_sensor_simulator.runSeconds(10);
+
 	double latitude_new  = -33.0000005;
 	double longitude_new = 18.0000005;
 	float  altitude_new  = 150.0;
@@ -207,6 +211,24 @@ TEST_F(EkfBasicsTest, reset_ekf_global_origin)
 	// EKF origin MSL altitude cannot be reset without valid MSL origin.
 	EXPECT_DOUBLE_EQ(latitude, latitude_new);
 	EXPECT_DOUBLE_EQ(longitude, longitude_new);
+
+	// After the change of origin, the pos and vel innovations should stay small
+	_sensor_simulator.runSeconds(10);
+
+	float hpos[2] = {0.f, 0.f};
+	float vpos = 0.f;
+	float hvel[2] = {0.f, 0.f};
+	float vvel = 0.f;
+	const Vector2f zero = {0.0f, 0.0f};
+
+	_ekf->getGpsVelPosInnovRatio(hvel[0], vvel, hpos[0], vpos);
+
+	EXPECT_TRUE(matrix::isEqual(Vector2f(hpos), zero, 0.05f))
+		<< "pos = " << hpos[0] << ", " << hpos[1];
+	EXPECT_NEAR(vpos, 0.f, 0.05f);
+	EXPECT_TRUE(matrix::isEqual(Vector2f(hvel), zero, 0.02f))
+		<< "vel = " << hvel[0] << ", " << hvel[1];
+	EXPECT_NEAR(vvel, 0.f, 0.02f);
 }
 
 // TODO: Add sampling tests
