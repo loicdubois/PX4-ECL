@@ -683,7 +683,7 @@ bool Ekf::getEkfGlobalOrigin(uint64_t &origin_time, double &latitude, double &lo
 	return _NED_origin_initialised;
 }
 
-bool Ekf::setEkfGlobalOrigin(const double &latitude, const double &longitude, const float &altitude)
+bool Ekf::setEkfGlobalOrigin(const double latitude, const double longitude, const float altitude)
 {
 	bool current_pos_available = false;
 	double current_lat = static_cast<double>(NAN);

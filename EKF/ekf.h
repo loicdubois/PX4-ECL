@@ -152,7 +152,11 @@ public:
 	// get the ekf WGS-84 origin position and height and the system time it was last set
 	// return true if the origin is valid
 	bool getEkfGlobalOrigin(uint64_t &origin_time, double &latitude, double &longitude, float &origin_alt) const;
-	bool setEkfGlobalOrigin(const double &latitude, const double &longitude, const float &altitude);
+	bool setEkfGlobalOrigin(const double latitude, const double longitude, const float altitude);
+
+	float getEkfGlobalOriginAltitude() const { return _gps_alt_ref; }
+	bool setEkfGlobalOriginAltitude(const float altitude);
+
 
 	// get the 1-sigma horizontal and vertical position uncertainty of the ekf WGS-84 position
 	void get_ekf_gpos_accuracy(float *ekf_eph, float *ekf_epv) const;
@@ -261,8 +265,6 @@ public:
 		_state_reset_status.quat_change.copyTo(delta_quat);
 		*counter = _state_reset_status.quat_counter;
 	}
-
-	const float &global_origin_altitude() const { return _gps_alt_ref; }
 
 	// get EKF innovation consistency check status information comprising of:
 	// status - a bitmask integer containing the pass/fail status for each EKF measurement innovation consistency check
